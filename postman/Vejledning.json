@@ -1,0 +1,3340 @@
+{
+	"info": {
+		"_postman_id": "d522f5c4-af3d-4980-bf16-eb6e1a819583",
+		"name": "Vejledning",
+		"description": "**Generelt**\n\nDenne collection er til import i Postman og kan bruges til at teste requests mod Dupla services med et java web token(jwt). Den kan bla. bruges til at verificere hvordan et system skal kalde mod Dupla.\n\nFolderen Token indeholder ét request der giver et jwt der gemmes i en global parameter kaldet token. Dette token(jwt) kan bruges mod alle requests i denne collection.\n\nFolderen Services indeholder subfoldere for hver service i Dupla med tilgængelige requests og API specifikation for hver service.\n\nHver request indeholder krævede og mulige parametre og headere.\n\n**Opsætning**\n\nInstaller Postman([https://www.postman.com/](https://www.postman.com/)) og opret et workspace(knappen New).\n\nI det oprettede workspace importeres filen Vejledning.json.\n\nFor at benytte den importerede collection skal der tilføjes et voces certifikat. Alle benyttede aftaler er tilknyttet et offentligt tilgængeligt voces certifikat fra Nets([https://www.nets.eu/dk-da/kundeservice/nemid-tjenesteudbyder/NemID-tjenesteudbyderpakken/Pages/OCES-II-certifikat-eksempler.aspx](https://www.nets.eu/dk-da/kundeservice/nemid-tjenesteudbyder/NemID-tjenesteudbyderpakken/Pages/OCES-II-certifikat-eksempler.aspx)).\n\nDownload DanID Test (gyldig) under Virksomhedscertifikater.\n\nI settings i Postman vælges Certificates og derefter Add certificate.\n\nI host skrives oces.billetautomat-uat.skat.dk, vælg Select file ved PKX file og indsæt det downloadede certitikat, indtast Test1234 i Passphrase og tryk på knappen Add.\n\nKald requestet Hent token i folderen Token og kald derefter det ønskede request for en service.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10434153"
+	},
+	"item": [
+		{
+			"name": "Token",
+			"item": [
+				{
+					"name": "Hent token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.globals.set(\"token\", jsonData.access_token);",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"client_id\": \"api-gateway\",\n    \"nonce\":\"f6a331c8-ace5-4bbe-8015-6f957d1fbe78\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://oces.billetautomat-uat.skat.dk/auth/realms/oces/certificates/cert",
+							"protocol": "https",
+							"host": [
+								"oces",
+								"billetautomat-uat",
+								"skat",
+								"dk"
+							],
+							"path": [
+								"auth",
+								"realms",
+								"oces",
+								"certificates",
+								"cert"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Services",
+			"item": [
+				{
+					"name": "DeleøkonomiIndberetninger",
+					"item": [
+						{
+							"name": "api_dataudstilling_indberetningerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Deleoekonomiindberetninger-api_dataudstilling_indberetningerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/deleoekonomiindberetninger?PersonCPRNummer=1610190002&VirksomhedSENummer=33064535&DeleøkonomiIndkomstÅr=2020",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"deleoekonomiindberetninger"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "1610190002"
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "33064535"
+										},
+										{
+											"key": "DeleøkonomiIndkomstÅr",
+											"value": "2020"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "api_dataudstilling_indberetninger_{DeleøkonomiIndberetningDataId}Hent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Deleoekonomiindberetninger-api_dataudstilling_indberetningHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/deleoekonomiindberetninger/666ce868-494b-4e4e-b731-86ea0fb8770f*21ba89cc-9b8a-455d-880d-aa002628a661",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"deleoekonomiindberetninger",
+										"666ce868-494b-4e4e-b731-86ea0fb8770f*21ba89cc-9b8a-455d-880d-aa002628a661"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/deleoekonomiindberetninger/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"deleoekonomiindberetninger",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Diskvalifikationer",
+					"item": [
+						{
+							"name": "CPS_DiskvalifikationerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Diskvalifikationer-CPS_DiskvalifikationerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Diskvalifikationer?PersonCPRNummer=2202551117",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Diskvalifikationer"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "2202551117"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/diskvalifikationer/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"diskvalifikationer",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Forskudsopgørelser",
+					"item": [
+						{
+							"name": "ForskudsopgørelseHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Forskudsopgoerelser-ForskudsopgoerelseHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Forskudsopg%C3%B8relse?PersonCPRNummer=0110849974&IndkomstÅr=2019",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Forskudsopg%C3%B8relse"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "0110849974"
+										},
+										{
+											"key": "IndkomstÅr",
+											"value": "2019"
+										},
+										{
+											"key": "ForskudsopgørelseGyldigTidspunkt",
+											"value": "2020-03-05T11:07:14Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringTil",
+											"value": "2022-08-14T17:49:23Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringFra",
+											"value": "2020-03-05T11:07:14Z",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specfikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/forskudsopgoerelser/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"forskudsopgoerelser",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Kontrolobservationer",
+					"item": [
+						{
+							"name": "KontrolobservationerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"type": "text",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Kontrolobservationer-KontrolobservationerHent-19552101"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									},
+									{
+										"key": "X-Request-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Kontrolobservationer?PersonCPRNummer=2212982744",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Kontrolobservationer"
+									],
+									"query": [
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2010-07-05",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2019-12-31",
+											"disabled": true
+										},
+										{
+											"key": "PersonCPRNummer",
+											"value": "2212982744"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/kontrolobservationer/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"kontrolobservationer",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Kontroloplysninger",
+					"item": [
+						{
+							"name": "PersonkontroloplysningerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:36eed29f-4390-453a-91c8-a0c60a75a264",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/personkontroloplysninger?KontrolOplysningRapportIndkomstÅr=2020&PersonCPRNummer=2208983000",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"personkontroloplysninger"
+									],
+									"query": [
+										{
+											"key": "KontrolOplysningRapportIndkomstÅr",
+											"value": "2020"
+										},
+										{
+											"key": "PersonCPRNummer",
+											"value": "2208983000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "VirksomhedskontroloplysningerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:76149433-4b0e-47d9-9072-1b96cb338f1d",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/virksomhedskontroloplysninger?KontrolOplysningRapportIndkomstÅr=2018&VirksomhedSENummer=40257209",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"virksomhedskontroloplysninger"
+									],
+									"query": [
+										{
+											"key": "KontrolOplysningRapportIndkomstÅr",
+											"value": "2018"
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "40257209"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/kontroloplysninger/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"kontroloplysninger",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Kontrolregistreringer",
+					"item": [
+						{
+							"name": "VirksomhedKontrolregistreringerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Kontrolregistreringer-VirksomhedKontrolregistreringerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Kontrolregistreringer/Virksomhed?VirksomhedSENummer=33545574",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Kontrolregistreringer",
+										"Virksomhed"
+									],
+									"query": [
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2017-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2022-01-01",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "30682061",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "33545574"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PersonKontrolregistreringerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Kontrolregistreringer-PersonKontrolregistreringerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Kontrolregistreringer/Person?PersonCPRNummer=0112486886",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Kontrolregistreringer",
+										"Person"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "0112486886"
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2017-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2012-01-01",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/kontrolregistreringer/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"kontrolregistreringer",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Ligningssager",
+					"item": [
+						{
+							"name": "LigningssagerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"type": "text",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Ligningsager-LigningssagerHent-19552101"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									},
+									{
+										"key": "X-Request-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Ligningssager?PersonCPRNummer=0105680000&VirksomhedSENummer=36609044",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Ligningssager"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "0105680000"
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "36609044"
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "36609052",
+											"disabled": true
+										},
+										{
+											"key": "SagTypeKode",
+											"value": "99999",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2017-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2022-01-01",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/ligningssager/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"ligningssager",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Logbog",
+					"item": [
+						{
+							"name": "DagsoversigtHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-DagsoversigtHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/produktionsenheder/1003392434/oversigt/2021-11-19",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"produktionsenheder",
+										"1003392434",
+										"oversigt",
+										"2021-11-19"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DatawareHouseLogbogHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-DatawareHouseLogbogHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/datawarehouse?PeriodeTilDato=2025-03-05T11:07:15Z&PeriodeFraDato=2021-11-16T11:07:15Z",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"datawarehouse"
+									],
+									"query": [
+										{
+											"key": "PeriodeTilDato",
+											"value": "2025-03-05T11:07:15Z"
+										},
+										{
+											"key": "PeriodeFraDato",
+											"value": "2021-11-16T11:07:15Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "VirksomhedHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-VirksomhedHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/virksomheder/33896263",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"virksomheder",
+										"33896263"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ArbejdstagereHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-ArbejdstagereHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/arbejdstagere/ea966979-6cc6-4386-a1ab-f23dae8a1359",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"arbejdstagere",
+										"ea966979-6cc6-4386-a1ab-f23dae8a1359"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ArbejdstagereListeHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-ArbejdstagereListeHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/virksomheder/30267214/arbejdstagere?SorteretSenestOpdateret=true",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"virksomheder",
+										"30267214",
+										"arbejdstagere"
+									],
+									"query": [
+										{
+											"key": "SorteretSenestOpdateret",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ArbejdstidsangivelserHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-ArbejdstidsangivelserHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/angivelser/1f5b37d3-2b2e-402a-b630-23a49c4ce545",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"angivelser",
+										"1f5b37d3-2b2e-402a-b630-23a49c4ce545"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ProduktionsenhedHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-ProduktionsenhedHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/produktionsenheder/1003392434",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"produktionsenheder",
+										"1003392434"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LogbogspligterOpret",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 201\", () => {",
+											"  pm.expect(pm.response.code).to.eql(201);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-LogbogspligterOpret-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"attributes\": {\n            \"MyndighedNavn\": \"Test\",\n            \"MyndighedCVRNummer\": \"26432693\",\n            \"RegistreringForholdGyldigFra\": \"2021-09-17\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/virksomheder/82058877/pligter",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"virksomheder",
+										"82058877",
+										"pligter"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SkattemappeOplysningerBorgerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-SkattemappeOplysningerBorgerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/skattemappe/1110012027?Index=1&PeriodeTilDato=2030-12-01T12:41:48Z&AntalPrSide=1&PeriodeFraDato=2021-11-16T12:41:48Z",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"skattemappe",
+										"1110012027"
+									],
+									"query": [
+										{
+											"key": "Index",
+											"value": "1"
+										},
+										{
+											"key": "PeriodeTilDato",
+											"value": "2030-12-01T12:41:48Z"
+										},
+										{
+											"key": "AntalPrSide",
+											"value": "1"
+										},
+										{
+											"key": "PeriodeFraDato",
+											"value": "2021-11-16T12:41:48Z"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LogbogspligterOpdater",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-LogbogspligterOpdater-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"Pligt\",\n    \"attributes\": {\n      \"RegistreringForholdGyldigTil\": \"2021-09-28\",\n      \"PligtÆndringÅrsag\": \"Årsag til ændring\"\n    }\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/pligter/bc6cddac-bcd5-480c-9009-91efcc57986b",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"pligter",
+										"bc6cddac-bcd5-480c-9009-91efcc57986b"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LogbogspligterSlet",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 204\", () => {",
+											"  pm.expect(pm.response.code).to.eql(204);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Logbog-LogbogspligterSlet-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"Pligt\",\n    \"attributes\": {\n      \"PligtÆndringÅrsag\": \"Årsag til ændring\"\n    }\n  }\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Logbog/pligter/bc6cddac-bcd5-480c-9009-91efcc57986b",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Logbog",
+										"pligter",
+										"bc6cddac-bcd5-480c-9009-91efcc57986b"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/logbog/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"logbog",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Lønsumsangivelser",
+					"item": [
+						{
+							"name": "LønsumsangivelserHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"type": "text",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Loensumsangivelser-LoensumsangivelserHent-19552101"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									},
+									{
+										"key": "X-Request-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/L%C3%B8nsumsangivelser?VirksomhedSENummer=29092516",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"L%C3%B8nsumsangivelser"
+									],
+									"query": [
+										{
+											"key": "VirksomhedSENummer",
+											"value": "29092516"
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2018-03-05",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2025-03-05",
+											"disabled": true
+										},
+										{
+											"key": "AngivelseGyldigDatoFra",
+											"value": "2019-09-30",
+											"disabled": true
+										},
+										{
+											"key": "AngivelseGyldigDatoTil",
+											"value": "2021-10-10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/loensumsangivelser/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"loensumsangivelser",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Momsangivelser",
+					"item": [
+						{
+							"name": "MomsangivelseHent",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"type": "text",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Momsangivelser-MomsangivelseHent-19552101"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									},
+									{
+										"key": "X-Request-ID",
+										"type": "text",
+										"value": "{{$guid}}"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Momsangivelse?AfregningPeriodeForholdPeriodeStartDato=2017-01-01&AfregningPeriodeForholdPeriodeSlutDato=2017-01-31&VirksomhedSENummer=10000001",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Momsangivelse"
+									],
+									"query": [
+										{
+											"key": "VirksomhedSENummer",
+											"value": "10000025",
+											"disabled": true
+										},
+										{
+											"key": "AfregningPeriodeForholdPeriodeStartDato",
+											"value": "2017-01-01"
+										},
+										{
+											"key": "AfregningPeriodeForholdPeriodeSlutDato",
+											"value": "2017-01-31"
+										},
+										{
+											"key": "AngivelseGyldigFra",
+											"value": "2017-01-01T17:49:23Z",
+											"disabled": true
+										},
+										{
+											"key": "AngivelseGyldigTil",
+											"value": "2024-01-01T17:49:23Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringTil",
+											"value": "2023-12-11T10:47:59Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringFra",
+											"value": "2019-12-11T10:48:01Z",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "10000001"
+										}
+									]
+								},
+								"description": "X-AFTALE_ID skal være et gyldigt aftale id, som skal genereres. Dvs. {{MomsangivelseAftaleIDCI1}} skal initieres først eller udskiftes med gyldigt aftale id. PARAMS kan variere alt efter formål. Se spec for service."
+							},
+							"response": []
+						},
+						{
+							"name": "API specfikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/momsangivelser/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"momsangivelser",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Pensionsrettigheder",
+					"item": [
+						{
+							"name": "Pensionsrettigheder",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Pensionsrettigheder-PensionsrettighederHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "Side",
+										"value": "1",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "TekniskRegistreringDatoTil",
+										"value": "2025-01-01",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "TekniskRegistreringDatoFra",
+										"value": "2025-01-01",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Pensionsrettigheder?PersonCPRNummer=1203561101",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Pensionsrettigheder"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "1203561101"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/pensionsrettigheder/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"pensionsrettigheder",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Selskabsskatteoplysninger",
+					"item": [
+						{
+							"name": "SelskabSambeskatningskredsHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Selskabsskatteoplysninger-SelskabSambeskatningskredsHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Selskabsskatteoplysninger/Selskabsambeskatningskreds?SelskabSelvangivelseIndkomstÅr=2018&VirksomhedCVRNummer=42215902",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Selskabsskatteoplysninger",
+										"Selskabsambeskatningskreds"
+									],
+									"query": [
+										{
+											"key": "SelskabSelvangivelseIndkomstÅr",
+											"value": "2018"
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "42215902"
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2014-09-02",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2023-05-28",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "10208394",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "SelskabSelvangivelseHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Selskabsskatteoplysninger-SelskabSelvangivelseHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Selskabsskatteoplysninger/Selskabselvangivelse?SelskabSelvangivelseIndkomstÅr=2014&VirksomhedSENummer=10211743",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Selskabsskatteoplysninger",
+										"Selskabselvangivelse"
+									],
+									"query": [
+										{
+											"key": "SelskabSelvangivelseIndkomstÅr",
+											"value": "2014"
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "10211743"
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "10223474",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2010-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2022-01-01",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/selskabsskatteoplysninger/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"selskabsskatteoplysninger",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SelvstændigVirksomhedOplysninger",
+					"item": [
+						{
+							"name": "SelvstændigVirksomhedOplysningerHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:SelvstaendigVirksomhedOplysninger-SelvstaendigVirksomhedOplysningerHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Selvstændigvirksomhedoplysninger?PersonCPRNummer=0103510406&IndkomstÅr=1987",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Selvstændigvirksomhedoplysninger"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "0103510406"
+										},
+										{
+											"key": "IndkomstÅr",
+											"value": "1987"
+										},
+										{
+											"key": "ÅrsopgørelseGyldigFra",
+											"value": "2025-03-05",
+											"disabled": true
+										},
+										{
+											"key": "ÅrsopgørelseGyldigTil",
+											"value": "2025-03-05",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringFra",
+											"value": "2010-03-05T11:07:15Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringTil",
+											"value": "2025-03-05T11:07:15Z",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/selvstaendigvirksomhedoplysninger/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"selvstaendigvirksomhedoplysninger",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Virksomhedspligter",
+					"item": [
+						{
+							"name": "VirksomhedspligterHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Virksomhedspligter-VirksomhedspligterHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Virksomhedspligter?PligtKode=159&VirksomhedSENummer=29376220",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Virksomhedspligter"
+									],
+									"query": [
+										{
+											"key": "PligtKode",
+											"value": "159"
+										},
+										{
+											"key": "RegistreringForholdGyldigDatoFra",
+											"value": "2013-07-01",
+											"disabled": true
+										},
+										{
+											"key": "RegistreringForholdGyldigDatoTil",
+											"value": "2014-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2019-10-09",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2025-10-07",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "29376220"
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "29376220",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/virksomhedspligter/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"virksomhedspligter",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Virksomhedsstatus",
+					"item": [
+						{
+							"name": "VirksomhedsstatusHent",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Virksomhedsstatus-VirksomhedsstatusHent-19552101",
+										"type": "text"
+									},
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/Virksomhedsstatus?VirksomhedSENummer=82005307",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"Virksomhedsstatus"
+									],
+									"query": [
+										{
+											"key": "TekniskRegistreringDatoFra",
+											"value": "2010-01-01",
+											"disabled": true
+										},
+										{
+											"key": "TekniskRegistreringDatoTil",
+											"value": "2020-01-01",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedCVRNummer",
+											"value": "82000089",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedSENummer",
+											"value": "82005307"
+										},
+										{
+											"key": "VirksomhedStatusTypeGyldigFra",
+											"value": "2011-05-09",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedStatusTypeGyldigTil",
+											"value": "2025-01-01",
+											"disabled": true
+										},
+										{
+											"key": "VirksomhedStatusTypeKode",
+											"value": "10",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/virksomhedsstatus/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"virksomhedsstatus",
+										"v1",
+										"spec"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Årsopgørelser",
+					"item": [
+						{
+							"name": "ÅrsopgørelseHent",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Transaktions-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-ID",
+										"value": "{{$guid}}",
+										"type": "text"
+									},
+									{
+										"key": "UFST-Adgangsgrundlag",
+										"value": "urn:ufst:adgangsgrundlag:aftale:Aarsopgoerelser-AarsopgoerelseHent-19552101",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/%C3%85rsopg%C3%B8relse?PersonCPRNummer=0110869983&IndkomstÅr=2018",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"%C3%85rsopg%C3%B8relse"
+									],
+									"query": [
+										{
+											"key": "PersonCPRNummer",
+											"value": "0110869983"
+										},
+										{
+											"key": "IndkomstÅr",
+											"value": "2018"
+										},
+										{
+											"key": "ÅrsopgørelseGyldigFra",
+											"value": "2012-01-01",
+											"disabled": true
+										},
+										{
+											"key": "ÅrsopgørelseGyldigTil",
+											"value": "2012-01-01",
+											"disabled": true
+										},
+										{
+											"key": "SelvstændigVirksomhedOverskudFra",
+											"value": "30000",
+											"disabled": true
+										},
+										{
+											"key": "SelvstændigVirksomhedOverskudTil",
+											"value": "30000",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringTil",
+											"value": "2025-03-05T11:07:15Z",
+											"disabled": true
+										},
+										{
+											"key": "UdstillingRegistreringFra",
+											"value": "2025-03-05T11:07:15Z",
+											"disabled": true
+										},
+										{
+											"key": "Side",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "Sidestørrelse",
+											"value": "200",
+											"disabled": true
+										}
+									]
+								},
+								"description": "X-AFTALE_ID skal være et gyldigt aftale id, som skal genereres. Dvs. {{ÅrsopgørelseAftaleIDCI1}} skal initieres først eller udskiftes med gyldigt aftale id. PARAMS kan variere alt efter formål. Se spec for service."
+							},
+							"response": []
+						},
+						{
+							"name": "API specifikation",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", () => {",
+											"  pm.expect(pm.response.code).to.eql(200);",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://api.tfe.skat.dk/service/aarsopgoerelser/v1/spec",
+									"protocol": "https",
+									"host": [
+										"api",
+										"tfe",
+										"skat",
+										"dk"
+									],
+									"path": [
+										"service",
+										"aarsopgoerelser",
+										"v1",
+										"spec"
+									]
+								},
+								"description": "Vær opmærksom på at version(feks. v1 i url) ændres over tid og vil skulle tilrettes."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
