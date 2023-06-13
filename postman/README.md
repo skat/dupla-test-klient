@@ -27,6 +27,6 @@ Download DanID Test (gyldig) under Virksomhedscertifikater.
 
 I settings i Postman vælges Certificates og derefter Add certificate.
 
-I host skrives oces.billetautomat-uat.skat.dk, vælg Select file ved PFX file og indsæt det downloadede certitikat, indtast Test1234 i Passphrase og tryk på knappen Add.
+I host skrives oces.billetautomat.tfe.skat.dk, vælg Select file ved PFX file og indsæt det downloadede certitikat, indtast Test1234 i Passphrase og tryk på knappen Add.
 
 Kald requestet Hent token i folderen Token og kald derefter det ønskede request for en service.
