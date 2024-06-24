@@ -39,11 +39,11 @@
 							}
 						},
 						"url": {
-							"raw": "https://oces.billetautomat-uat.skat.dk/auth/realms/oces/certificates/cert",
+							"raw": "https://oces.billetautomat.tfe.skat.dk/auth/realms/oces/certificates/cert",
 							"protocol": "https",
 							"host": [
 								"oces",
-								"billetautomat-uat",
+								"billetautomat.tfe",
 								"skat",
 								"dk"
 							],
